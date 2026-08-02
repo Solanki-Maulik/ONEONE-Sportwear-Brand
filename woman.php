@@ -10,7 +10,7 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Women — STRIDE</title>
+    <title>Women — ONEONE</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -58,7 +58,7 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">STRIDE</a>
+                <a href="index.php" class="brand">ONEONE</a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">

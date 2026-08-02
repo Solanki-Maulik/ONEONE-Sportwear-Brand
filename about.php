@@ -1,7 +1,7 @@
 <?php
 require 'includes/session.php';
 require 'db.php';
-$brand = 'STRIDE';
+$brand = 'ONEONE';
 ?>
 <!DOCTYPE html>
 <html lang="en">

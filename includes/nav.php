@@ -1,5 +1,5 @@
     <nav>
-        <a href="index.php" class="brand">STRIDE</a>
+        <a href="index.php" class="brand">ONEONE</a>
         <input type="checkbox" id="nav-toggle" class="nav-toggle">
         <label for="nav-toggle" class="nav-toggle-label">&#9776;</label>
         <div class="nav_con">

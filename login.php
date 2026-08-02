@@ -1,6 +1,8 @@
 <?php
 require 'includes/session.php';
 require 'db.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 $login_error = "";
 $register_error = "";
@@ -58,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — STRIDE</title>
+    <title>Login — ONEONE</title>
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
@@ -68,8 +70,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         <div class="flip-card">
             <!-- FRONT: Login -->
             <div class="flip-face flip-front">
-                <a href="index.php" class="mini-brand">STRIDE</a>
-                <h3>Login</h3>
+                <div class="header-row">
+                    <a href="index.php" class="back-link">← Store</a>
+                    <div class="mini-brand">ONEONE</div>
+                </div>
+                <h3>Welcome Back</h3>
 
                 <?php if ($login_error): ?>
                     <div class="alert-box alert-error"><?php echo htmlspecialchars($login_error); ?></div>
@@ -80,16 +85,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
                 <form action="login.php" method="POST">
                     <input type="hidden" name="action" value="login">
-                    <input class="anm" type="email" name="email" placeholder="Enter email" required>
-                    <input class="anm" type="password" name="password" placeholder="Enter password" required>
-                    <button class="anm" type="submit">Login</button>
+                    <input class="anm" type="email" name="email" placeholder="Email address" required>
+                    <input class="anm" type="password" name="password" placeholder="Password" required>
+                    <button class="anm" type="submit">Log in</button>
                 </form>
-                <label for="flip-toggle">New here? Create an account</label>
+                <label for="flip-toggle" class="toggle-link">New here? <span>Create an account</span></label>
             </div>
 
             <!-- BACK: Register -->
             <div class="flip-face flip-back">
-                <a href="index.php" class="mini-brand">STRIDE</a>
+                <div class="header-row">
+                    <a href="index.php" class="back-link">← Store</a>
+                    <div class="mini-brand">ONEONE</div>
+                </div>
                 <h3>Create Account</h3>
 
                 <?php if ($register_error): ?>
@@ -99,26 +107,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 <form action="login.php" method="POST">
                     <input type="hidden" name="action" value="register">
                     <input class="anm" type="text" name="username" placeholder="Full name" required>
-                    <input class="anm" type="email" name="email" placeholder="Enter email" required>
-                    <input class="anm" type="password" name="password" placeholder="Enter password" required>
+                    <input class="anm" type="email" name="email" placeholder="Email address" required>
+                    <input class="anm" type="password" name="password" placeholder="Password" required>
                     <button class="anm" type="submit">Sign Up</button>
                 </form>
-                <label for="flip-toggle">Already have an account? Login</label>
+                <label for="flip-toggle" class="toggle-link">Already have an account? <span>Log in</span></label>
             </div>
         </div>
     </div>
 
+    <!-- GSAP for Lightning Fast, Smooth Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script>
         if (window.gsap) {
             function playAuthIntro(faceSelector) {
-                gsap.set(faceSelector + ' .anm', { opacity: 0, scale: 0 });
-                var tl = gsap.timeline();
-                tl.from(faceSelector + ' form', { scale: 0, duration: 0.8 });
-                tl.to(faceSelector + ' .anm', { opacity: 1, scale: 1, duration: 0.5, stagger: 0.15 });
+                // Instantly reset elements
+                gsap.set(faceSelector + ' .anm', { opacity: 0, y: 15 }); 
+                
+                // Fast, subtle slide-up animation (removed the slow scale effect)
+                gsap.to(faceSelector + ' .anm', { 
+                    opacity: 1, 
+                    y: 0, 
+                    duration: 0.35, 
+                    stagger: 0.08, 
+                    ease: "power2.out",
+                    delay: 0.1
+                });
             }
+            
             var toggle = document.getElementById('flip-toggle');
             playAuthIntro(toggle.checked ? '.flip-back' : '.flip-front');
+            
             toggle.addEventListener('change', function () {
                 playAuthIntro(this.checked ? '.flip-back' : '.flip-front');
             });

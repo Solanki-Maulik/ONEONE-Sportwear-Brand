@@ -1,6 +1,7 @@
 <?php
 require 'includes/session.php';
 require 'db.php';
+require 'includes/helpers.php'; // ADDED: This fixes the cart_count() error
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -29,7 +30,7 @@ function status_steps($status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Orders — STRIDE</title>
+    <title>Your Orders — ONEONE</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -107,7 +108,7 @@ function status_steps($status) {
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">STRIDE</a>
+                <a href="index.php" class="brand">ONEONE</a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">
@@ -128,5 +129,6 @@ function status_steps($status) {
         </div>
     </footer>
     </main>
+
 </body>
 </html>

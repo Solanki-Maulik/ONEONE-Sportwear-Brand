@@ -32,7 +32,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($product['name']); ?> — STRIDE</title>
+    <title><?php echo htmlspecialchars($product['name']); ?> — ONEONE</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -119,7 +119,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">STRIDE</a>
+                <a href="index.php" class="brand">ONEONE</a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">

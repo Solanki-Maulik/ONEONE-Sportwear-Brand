@@ -195,7 +195,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
         $conn->commit();
         cart_clear($conn, $user_id); unset($_SESSION['coupon_id']); unset($_SESSION['discount_percent']);
         ?>
-        <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Order placed — STRIDE</title><link rel="stylesheet" href="style.css"></head><body style="background:var(--paper-alt);">
+        <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Order placed — ONEONE</title><link rel="stylesheet" href="style.css"></head><body style="background:var(--paper-alt);">
         <section class="panel" style="text-align:center; margin-top:80px;">
             <span class="mono" style="color:#1F8A2E; letter-spacing:2px; text-transform:uppercase; font-size:12px;">Order confirmed</span>
             <h1 style="margin-top:14px;">Order placed!</h1>
@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart & Checkout — STRIDE</title>
+    <title>Cart & Checkout — ONEONE</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -354,7 +354,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">STRIDE</a>
+                <a href="index.php" class="brand">ONEONE</a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">

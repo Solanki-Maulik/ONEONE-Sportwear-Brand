@@ -176,6 +176,9 @@ nav img{ display: none; } /* legacy favicon img swapped for text wordmark */
 .hero-copy h1{
     font-size: clamp(44px, 6vw, 78px);
     margin-bottom: 22px;
+    color: rgb(248, 245, 245);
+    -webkit-text-stroke: 1px rgb(10, 1, 1);
+   
 }
 .hero-copy p{
     color: rgba(255,255,255,0.78);
