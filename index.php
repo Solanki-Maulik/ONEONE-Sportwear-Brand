@@ -204,7 +204,7 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
             <div class="category-strip">
                 <a href="man.php" class="category-tile">
                     <!-- Virat Kohli Image -->
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a1/Virat_Kohli_in_New_Delhi_in_December_2018.jpg" alt="Men's collection featuring Virat Kohli" style="object-position: top; object-fit: cover;">
+                    <img src="./img/Gemini_Generated_Image_69gp3h69gp3h69gp.png">
                     <div class="category-tile-label">
                         <span class="mono">Engineered For</span>
                         <h3>Men</h3>
@@ -213,7 +213,7 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                 </a>
                 <a href="woman.php" class="category-tile">
                     <!-- Smriti Mandhana Image -->
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Smriti_Mandhana_%28cropped%29.jpg" alt="Women's collection featuring Smriti Mandhana" style="object-position: top; object-fit: cover;">
+                    <img src="./img/Gemini_Generated_Image_o07obdo07obdo07o.png"  style="object-position: top; object-fit: cover;">
                     <div class="category-tile-label">
                         <span class="mono">Engineered For</span>
                         <h3>Women</h3>
