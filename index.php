@@ -17,179 +17,36 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
     <title>ONEONE — Performance Sportswear</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Hero Banner Slider Styles */
-        .hero-slider-container {
+        /* Hero Container */
+        .hero-section {
             position: relative;
             width: 100%;
-            height: 85vh;
-            min-height: 520px;
+            height: 80vh; /* Change to 100vh if you want it to fill the entire screen */
             overflow: hidden;
-            background: var(--ink);
+            background-color: #000; /* Fallback color */
         }
 
-        .hero-slide {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
-            transform: scale(1.05);
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-        }
-
-        .hero-slide.active {
-            opacity: 1;
-            transform: scale(1);
-            z-index: 1;
-        }
-
-        .hero-slide::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(16,19,26,0.92) 0%, rgba(16,19,26,0.55) 50%, rgba(16,19,26,0.2) 100%);
-        }
-
-        .hero-content-wrap {
-            position: relative;
-            z-index: 2;
+        /* The Local Video */
+        .hero-video {
             width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-
-        /* Banner Navigation Controls */
-        .hero-ctrl-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all var(--transition);
-        }
-
-        .hero-ctrl-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .hero-ctrl-prev { left: 24px; }
-        .hero-ctrl-next { right: 24px; }
-
-        .hero-dots {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            display: flex;
-            gap: 10px;
-        }
-
-        .hero-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            border: none;
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-
-        .hero-dot.active {
-            background: var(--accent);
-            width: 32px;
-            border-radius: 12px;
-        }
-
-        @media (max-width: 768px) {
-            .hero-slider-container { height: 70vh; }
-            .hero-content-wrap { padding: 0 20px; }
-            .hero-ctrl-btn { display: none; }
+            height: 100%;
+            object-fit: cover; /* This makes sure the video perfectly crops to fill the screen without stretching */
+            display: block;
         }
     </style>
 </head>
 <body>
     <main>
-        <header></header>
+        <!-- NAVIGATION FIXED HERE -->
+        <?php include 'includes/nav.php'; ?>
 
-        <section class="main" id="home">
-            <?php include 'includes/nav.php'; ?>
-
-            <!-- ============ DYNAMIC MOVING HERO SLIDER ============ -->
-            <div class="hero-slider-container">
-                
-                <!-- Slide 1 -->
-                <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1600&q=80');">
-                    <div class="hero-content-wrap">
-                        <div class="hero-copy">
-                            <span class="hero-eyebrow">// Performance sportswear</span>
-                            <h1>Move like<br>you mean it.</h1>
-                            <p>Footwear and jerseys engineered for people who train hard and don't stop at good enough. Built for the run, the court, and everything after.</p>
-                            <div class="hero-ctas" style="margin-top: 24px;">
-                                <a href="#shop-all" class="btn-primary">Shop Collection</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 2 -->
-                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1600&q=80');">
-                    <div class="hero-content-wrap">
-                        <div class="hero-copy">
-                            <span class="hero-eyebrow">// Pro Footwear Lineup</span>
-                            <h1>Precision<br>In Every Stride.</h1>
-                            <p>Lightweight cushioning paired with high-traction soles. Built for maximum speed, stability, and endurance on any terrain.</p>
-                            <div class="hero-ctas" style="margin-top: 24px;">
-                                <a href="man.php" class="btn-primary">Explore Footwear</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 3 -->
-                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1600&q=80');">
-                    <div class="hero-content-wrap">
-                        <div class="hero-copy">
-                            <span class="hero-eyebrow">// Match-Day Apparel</span>
-                            <h1>Sweat-Wicking<br>Comfort.</h1>
-                            <p>Official match jerseys and training gear crafted with climate-adapting breathable mesh to keep you cool under pressure.</p>
-                            <div class="hero-ctas" style="margin-top: 24px;">
-                                <a href="woman.php" class="btn-primary">Shop Apparel</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Controls -->
-                <button class="hero-ctrl-btn hero-ctrl-prev" onclick="changeSlide(-1)" aria-label="Previous Slide">&#10094;</button>
-                <button class="hero-ctrl-btn hero-ctrl-next" onclick="changeSlide(1)" aria-label="Next Slide">&#10095;</button>
-
-                <!-- Indicator Dots -->
-                <div class="hero-dots">
-                    <button class="hero-dot active" onclick="goToSlide(0)"></button>
-                    <button class="hero-dot" onclick="goToSlide(1)"></button>
-                    <button class="hero-dot" onclick="goToSlide(2)"></button>
-                </div>
-
-            </div>
+        <section class="hero-section">
+            <!-- Your Local Background Video -->
+            <video class="hero-video" autoplay loop muted playsinline>
+                <source src="img/a.mp4" type="video/mp4">
+            </video>
         </section>
-
+        
         <?php include 'includes/ticker.php'; ?>
 
         <!-- ============ CATEGORIES ============ -->
@@ -203,7 +60,7 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
             </div>
             <div class="category-strip">
                 <a href="man.php" class="category-tile">
-                    <!-- Virat Kohli Image -->
+                    <!-- Men Image -->
                     <img src="./img/Gemini_Generated_Image_69gp3h69gp3h69gp.png">
                     <div class="category-tile-label">
                         <span class="mono">Engineered For</span>
@@ -212,7 +69,7 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                     <span class="category-tile-arrow">&#8594;</span>
                 </a>
                 <a href="woman.php" class="category-tile">
-                    <!-- Smriti Mandhana Image -->
+                    <!-- Women Image -->
                     <img src="./img/Gemini_Generated_Image_o07obdo07obdo07o.png"  style="object-position: top; object-fit: cover;">
                     <div class="category-tile-label">
                         <span class="mono">Engineered For</span>
@@ -336,7 +193,8 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                 </div>
             </div>
             <div class="footer-bottom">
-                <span>&copy; <?php echo date('Y'); ?> STRIDE Sportswear</span>
+                <!-- BRAND NAME FIXED HERE -->
+                <span>&copy; <?php echo date('Y'); ?> ONEONE</span>
                 <span>Made for people who don't stop at good enough.</span>
             </div>
         </footer>
@@ -359,48 +217,6 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                 });
             });
         }
-
-        // Hero Background Carousel (Switches every 4000ms = 4 seconds)
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.hero-slide');
-        const dots = document.querySelectorAll('.hero-dot');
-        const slideIntervalTime = 4000;
-        let slideTimer;
-
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.remove('active');
-                dots[i].classList.remove('active');
-            });
-
-            currentSlide = (index + slides.length) % slides.length;
-            slides[currentSlide].classList.add('active');
-            dots[currentSlide].classList.add('active');
-        }
-
-        function changeSlide(direction) {
-            showSlide(currentSlide + direction);
-            resetSlideTimer();
-        }
-
-        function goToSlide(index) {
-            showSlide(index);
-            resetSlideTimer();
-        }
-
-        function startSlideTimer() {
-            slideTimer = setInterval(() => {
-                showSlide(currentSlide + 1);
-            }, slideIntervalTime);
-        }
-
-        function resetSlideTimer() {
-            clearInterval(slideTimer);
-            startSlideTimer();
-        }
-
-        // Initialize Auto Slide
-        startSlideTimer();
     </script>
 </body>
 </html>
