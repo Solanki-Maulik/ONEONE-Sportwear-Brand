@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../includes/session.php';
 
 // BOUNCER: Admin only
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -13,34 +13,47 @@ $message = "";
 
 // --- HANDLE COUPON CREATION ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $code = strtoupper(trim($_POST['code'])); 
-    $discount = (int)$_POST['discount_percent'];
-    $expiry = $_POST['expiry_date'];
-    
-    $stmt = $conn->prepare("INSERT INTO coupons (code, discount_percent, expiry_date) VALUES (?, ?, ?)");
-    $stmt->bind_param("sis", $code, $discount, $expiry);
-    
-    // Use try-catch to prevent Fatal Errors on duplicate entries
-    try {
-        $stmt->execute();
-        $message = "<div style='background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>✅ Coupon <b>$code</b> added successfully!</div>";
-    } catch (mysqli_sql_exception $e) {
-        // Error code 1062 means "Duplicate Entry" in MySQL
-        if ($e->getCode() == 1062) {
-            $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Error: The coupon code <b>$code</b> already exists! Try a different name.</div>";
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Security token mismatch. Please try again.</div>";
+    } else {
+        $code = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', trim($_POST['code'] ?? ''))); 
+        $discount = (int)($_POST['discount_percent'] ?? 0);
+        $expiry = $_POST['expiry_date'] ?? '';
+
+        if (empty($code) || $discount <= 0 || $discount > 100 || empty($expiry)) {
+            $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Please provide valid coupon details (discount between 1% and 100%).</div>";
         } else {
-            $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Database Error: " . $e->getMessage() . "</div>";
+            $stmt = $conn->prepare("INSERT INTO coupons (code, discount_percent, expiry_date) VALUES (?, ?, ?)");
+            $stmt->bind_param("sis", $code, $discount, $expiry);
+            
+            try {
+                $stmt->execute();
+                $message = "<div style='background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>✅ Coupon <b>" . htmlspecialchars($code) . "</b> added successfully!</div>";
+            } catch (mysqli_sql_exception $e) {
+                if ($e->getCode() == 1062) {
+                    $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Error: The coupon code <b>" . htmlspecialchars($code) . "</b> already exists! Try a different name.</div>";
+                } else {
+                    $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Database error while creating coupon.</div>";
+                }
+            }
+            $stmt->close();
         }
     }
-    $stmt->close();
 }
 
 // --- HANDLE COUPON DISABLE ---
 if (isset($_GET['disable'])) {
-    $id = (int)$_GET['disable'];
-    $conn->query("UPDATE coupons SET is_active = FALSE WHERE id = $id");
-    header("Location: coupons.php");
-    exit();
+    if (verify_csrf_token($_GET['token'] ?? '')) {
+        $id = (int)$_GET['disable'];
+        $stmt = $conn->prepare("UPDATE coupons SET is_active = FALSE WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+        header("Location: coupons.php");
+        exit();
+    } else {
+        $message = "<div style='background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;'>❌ Security token mismatch.</div>";
+    }
 }
 
 // Fetch all coupons to display in the table
@@ -53,15 +66,16 @@ $coupons = $conn->query("SELECT * FROM coupons ORDER BY id DESC");
     <meta charset="UTF-8">
     <title>Manage Coupons - Admin</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f4f7f6; color: #333; }
+        /* BASE STYLES */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f0f2f5; color: #333; }
         
-        /* Sidebar Styles */
-        .sidebar { width: 250px; background: #111; color: white; min-height: 100vh; padding: 20px; box-sizing: border-box; }
-        .sidebar h2 { color: #fff; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; font-size: 20px; text-transform: uppercase; }
-        .sidebar a { color: #aaa; text-decoration: none; display: block; padding: 12px 10px; margin-bottom: 5px; border-radius: 4px; transition: 0.3s; }
-        .sidebar a:hover, .sidebar a.active { background: #333; color: #f39c12; }
+        /* UNIFIED SIDEBAR STYLES */
+        .sidebar { width: 260px; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-top: 0; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #2d3238; color: white; }
         .sidebar .logout { color: #e74c3c; margin-top: 30px; }
-        .sidebar .logout:hover { background: #e74c3c; color: white; }
+        .sidebar .logout:hover { background: #c0392b; color: white; }
         
         /* Main Content Styles */
         .main-content { padding: 40px; flex-grow: 1; box-sizing: border-box; }
@@ -85,7 +99,7 @@ $coupons = $conn->query("SELECT * FROM coupons ORDER BY id DESC");
 
     <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <h2>Sportswear Elite</h2>
+        <h2>STRIDE Elite</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
         <a href="manage_products.php">📦 Manage Products</a>
@@ -101,6 +115,7 @@ $coupons = $conn->query("SELECT * FROM coupons ORDER BY id DESC");
         <?php echo $message; ?>
         
         <form action="coupons.php" method="POST" class="coupon-form">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
             <label>Code Name (e.g., BCA50):</label>
             <input type="text" name="code" placeholder="Enter code name" required>
             
@@ -126,7 +141,7 @@ $coupons = $conn->query("SELECT * FROM coupons ORDER BY id DESC");
                 <?php while($row = $coupons->fetch_assoc()): ?>
                 <tr>
                     <td><strong style="font-size: 18px; color: #111;"><?php echo htmlspecialchars($row['code']); ?></strong></td>
-                    <td><span style="background: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;"><?php echo $row['discount_percent']; ?>% OFF</span></td>
+                    <td><span style="background: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; font-weight: bold;"><?php echo htmlspecialchars($row['discount_percent']); ?>% OFF</span></td>
                     <td><?php echo date('M d, Y', strtotime($row['expiry_date'])); ?></td>
                     <td>
                         <?php if($row['is_active'] && strtotime($row['expiry_date']) >= strtotime(date('Y-m-d'))): ?>
@@ -137,7 +152,7 @@ $coupons = $conn->query("SELECT * FROM coupons ORDER BY id DESC");
                     </td>
                     <td>
                         <?php if($row['is_active']): ?>
-                            <a href="coupons.php?disable=<?php echo $row['id']; ?>" style="color: #dc3545; text-decoration: none; font-weight: bold;" onclick="return confirm('Are you sure you want to disable this coupon?');">Disable</a>
+                            <a href="coupons.php?disable=<?php echo $row['id']; ?>&token=<?php echo urlencode(csrf_token()); ?>" style="color: #dc3545; text-decoration: none; font-weight: bold;" onclick="return confirm('Are you sure you want to disable this coupon?');">Disable</a>
                         <?php endif; ?>
                     </td>
                 </tr>

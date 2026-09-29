@@ -21,7 +21,8 @@ if ($result->num_rows === 0) {
 $product = $result->fetch_assoc();
 $stmt->close();
 
-$gallery = $conn->query("SELECT image_path FROM product_images WHERE product_id = " . $product_id);
+// The unused $gallery query was removed from here.
+
 $sizes = get_product_sizes($conn, $product_id);
 $total_stock = 0;
 foreach ($sizes as $s) { $total_stock += $s['stock']; }
@@ -43,22 +44,50 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
     <?php include 'includes/ticker.php'; ?>
 
     <section class="panel product-detail-wrap">
+        <!-- LEFT COLUMN: IMAGES -->
         <div>
-            <?php if (!empty($product['image_url'])): ?>
-                <img id="mainImage" src="<?php echo htmlspecialchars($product['image_url']); ?>" style="width:340px; height:340px; object-fit:contain; background:var(--paper-alt); border-radius:18px; padding:24px;">
-            <?php endif; ?>
-            <div class="thumbs">
-                <?php while ($img = $gallery->fetch_assoc()): ?>
-                    <img src="<?php echo htmlspecialchars($img['image_path']); ?>" onclick="document.getElementById('mainImage').src=this.src">
-                <?php endwhile; ?>
+            <?php 
+            // 1. Split the images into an array
+            $images = [];
+            if (!empty($product['image_url'])) {
+                $images = explode(',', $product['image_url']);
+            }
+            // 2. Define the main starting image
+            $main_image = !empty($images) ? trim($images[0]) : 'img/favicon.png';
+            ?>
+
+            <!-- The Main Large Image -->
+            <div class="product-main-image-container">
+                <img id="mainProductImage" src="<?php echo htmlspecialchars($main_image); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; border-radius: 12px; object-fit: cover;">
             </div>
+
+            <!-- The Clickable Thumbnails -->
+            <?php if (count($images) > 1): ?>
+                <div class="product-thumbnails" style="display: flex; gap: 10px; margin-top: 15px; overflow-x: auto;">
+                    <?php foreach ($images as $img): 
+                        $clean_img = trim($img);
+                    ?>
+                        <img src="<?php echo htmlspecialchars($clean_img); ?>" 
+                             alt="Thumbnail" 
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s;"
+                             onclick="document.getElementById('mainProductImage').src='<?php echo htmlspecialchars($clean_img); ?>'"
+                             onmouseover="this.style.border='2px solid #FF4D23'"
+                             onmouseout="this.style.border='2px solid transparent'">
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
 
+        <!-- RIGHT COLUMN: PRODUCT INFO -->
         <div class="info">
             <span class="cat-label"><?php echo htmlspecialchars($product['category_name']); ?></span>
             <h1><?php echo htmlspecialchars($product['name']); ?></h1>
             <?php render_price($product['price'], $product['mrp']); ?>
-            <p style="color:var(--slate); line-height:1.6; margin-top:14px;"><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
+            
+            <p style="color:var(--slate); line-height:1.6; margin-top:14px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                <?php echo nl2br(htmlspecialchars($product['description'])); ?>
+            </p>
+            
             <p class="mono" style="margin-top:14px; font-size:13px; color: <?php echo $total_stock > 0 ? '#1F8A2E' : '#D93E14'; ?>;" id="stockLine">
                 <?php echo $total_stock > 0 ? "In stock — " . $total_stock . " available" : "Out of stock"; ?>
             </p>
@@ -87,6 +116,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
                     <button type="submit" name="add_to_cart" class="btn-dark" <?php echo $total_stock <= 0 ? 'disabled' : ''; ?>>Add to cart</button>
                 <?php endif; ?>
             </form>
+            
             <?php if (!empty($sizes)): ?>
             <script>
                 function selectSize(btn){
@@ -105,6 +135,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
                     document.getElementById('stockLine').textContent = 'In stock — ' + stock + ' available in this size';
                     document.getElementById('stockLine').style.color = '#1F8A2E';
                 }
+                
                 document.getElementById('addToCartForm').addEventListener('submit', function(e){
                     if (!document.getElementById('selectedSize').value) {
                         e.preventDefault();
@@ -113,7 +144,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
                 });
             </script>
             <?php endif; ?>
-        </div>
+        </div> 
     </section>
 
     <footer id="fotter">
@@ -136,7 +167,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> STRIDE Sportswear</span>
+            <span>&copy; <?php echo date('Y'); ?> ONEONE</span>
             <span>Made for people who don't stop at good enough.</span>
         </div>
     </footer>

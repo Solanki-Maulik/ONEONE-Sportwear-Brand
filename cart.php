@@ -8,7 +8,7 @@ $message = "";
 // Add to cart
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     if (!isset($_SESSION['user_id'])) {
-        echo "<script>alert('Please login first to add items to your cart.'); window.location.href='login.php';</script>";
+        header("Location: login.php");
         exit();
     }
     $product_id = (int)$_POST['product_id'];
@@ -23,9 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         header("Location: cart.php");
         exit();
     } else {
-        // Don't fail silently - this is exactly what made "add to cart does
-        // nothing" so hard to notice. Redirect back to the product/shop page
-        // with a clear reason instead of pretending it worked.
+        // Redirect back to product page with stock error
+
         $back = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         $sep = (strpos($back, '?') === false) ? '?' : '&';
         header("Location: " . $back . $sep . "stock_error=1");
@@ -137,11 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
         $payment_error = "Please enter a valid pincode.";
     }
 
-    // Build a safe, display-only payment detail string. We deliberately never
-    // store a full card number or CVV anywhere - only the last 4 digits, the
-    // same way a real receipt shows "Card ending in 4242". There's no actual
-    // payment gateway behind this - it's a realistic-looking checkout step,
-    // not real payment processing.
+    // Format payment details for display. We only store the last 4 digits for security.
+
     $payment_detail = null;
     if ($payment_error === '' && $payment_method === 'card') {
         $card_digits = preg_replace('/\D/', '', $_POST['card_number'] ?? '');
@@ -153,7 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
         } else {
             $payment_detail = "Card ending in " . substr($card_digits, -4);
         }
-        // $card_digits and $cvv intentionally go out of scope here - never inserted into the database.
+        // Do not insert $card_digits and $cvv into database
+
     } elseif ($payment_error === '' && $payment_method === 'upi') {
         $upi_id = trim($_POST['upi_id'] ?? '');
         if (!preg_match('/^[\w.\-]{2,}@[\w.\-]{2,}$/', $upi_id)) {
@@ -246,7 +243,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
                     $line_total = $item['price'] * $item['cart_quantity'];
                 ?>
                 <div class="cart-line">
-                    <?php if (!empty($item['image_url'])): ?><img src="<?php echo htmlspecialchars($item['image_url']); ?>"><?php endif; ?>
+                    <?php 
+    if (!empty($item['image_url'])): 
+        // Split the images and select the first one
+        $images = explode(',', $item['image_url']);
+        $first_image = trim($images[0]);
+?>
+    <img src="<?php echo htmlspecialchars($first_image); ?>" alt="Product Image">
+<?php else: ?>
+    <img src="img/favicon.png" alt="No image">
+<?php endif; ?>
                     <div class="cart-line-info">
                         <h5><?php echo htmlspecialchars($item['name']); ?></h5>
                         <?php render_price($item['price'], $item['mrp']); ?>

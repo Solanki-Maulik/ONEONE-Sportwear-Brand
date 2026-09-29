@@ -930,3 +930,37 @@ footer#fotter{
     .cart-line .cart-line-total{ min-width: auto; margin-left: auto; }
     .cart-table th:nth-child(2), .cart-table td:nth-child(2){ display: none; }
 }
+
+/* --- PRODUCT DETAIL PAGE LAYOUT --- */
+.product-detail-wrap {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 50px; /* Space between image and text */
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Left side (Images) takes exactly 50% */
+.product-detail-wrap > div:first-child {
+    width: 50%;
+    flex-shrink: 0;
+}
+
+/* Right side (Text Info) takes exactly 50% */
+.product-detail-wrap .info {
+    width: 50%;
+}
+
+/* Mobile Fix: Stack them on small screens */
+@media (max-width: 768px) {
+    .product-detail-wrap {
+        flex-direction: column;
+        gap: 30px;
+    }
+    .product-detail-wrap > div:first-child, 
+    .product-detail-wrap .info {
+        width: 100%;
+    }
+}

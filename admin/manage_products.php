@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../includes/session.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
@@ -8,42 +8,50 @@ require '../db.php';
 
 $message = "";
 
-// --- Handlers for GET Actions remain here ---
+// --- Handlers for GET Actions (Protected with CSRF Tokens) ---
 
 // Handle Product Deletion
 if (isset($_GET['delete'])) {
-    $delete_id = (int)$_GET['delete'];
-    try {
-        $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
-        $stmt->bind_param("i", $delete_id);
-        $stmt->execute();
-        $message = "<div class='alert alert-green'>Product deleted successfully.</div>";
-    } catch (Exception $e) {
-        $message = "<div class='alert alert-red'>Cannot delete product. It is already linked to customer orders. Update stock to 0 instead.</div>";
+    if (verify_csrf_token($_GET['token'] ?? '')) {
+        $delete_id = (int)$_GET['delete'];
+        try {
+            $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+            $stmt->bind_param("i", $delete_id);
+            $stmt->execute();
+            $message = "<div class='alert alert-green'>Product deleted successfully.</div>";
+        } catch (Exception $e) {
+            $message = "<div class='alert alert-red'>Cannot delete product. It is already linked to customer orders. Update stock to 0 instead.</div>";
+        }
+    } else {
+        $message = "<div class='alert alert-red'>Security token mismatch. Action aborted.</div>";
     }
 }
 
 // Handle removing all sizes
 if (isset($_GET['remove_sizes'])) {
-    $rs_id = (int)$_GET['remove_sizes'];
-    $stmt = $conn->prepare("SELECT COALESCE(SUM(stock), 0) AS total FROM product_sizes WHERE product_id = ?");
-    $stmt->bind_param("i", $rs_id);
-    $stmt->execute();
-    $total_stock = $stmt->get_result()->fetch_assoc()['total'];
-    $stmt->close();
+    if (verify_csrf_token($_GET['token'] ?? '')) {
+        $rs_id = (int)$_GET['remove_sizes'];
+        $stmt = $conn->prepare("SELECT COALESCE(SUM(stock), 0) AS total FROM product_sizes WHERE product_id = ?");
+        $stmt->bind_param("i", $rs_id);
+        $stmt->execute();
+        $total_stock = $stmt->get_result()->fetch_assoc()['total'];
+        $stmt->close();
 
-    $del = $conn->prepare("DELETE FROM product_sizes WHERE product_id = ?");
-    $del->bind_param("i", $rs_id);
-    $del->execute();
-    $del->close();
+        $del = $conn->prepare("DELETE FROM product_sizes WHERE product_id = ?");
+        $del->bind_param("i", $rs_id);
+        $del->execute();
+        $del->close();
 
-    // Carry stock back to the main products table
-    $upd = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
-    $upd->bind_param("ii", $total_stock, $rs_id);
-    $upd->execute();
-    $upd->close();
+        // Carry stock back to the main products table
+        $upd = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
+        $upd->bind_param("ii", $total_stock, $rs_id);
+        $upd->execute();
+        $upd->close();
 
-    $message = "<div class='alert alert-green'>Sizes removed - product now shows a plain Add to Cart button.</div>";
+        $message = "<div class='alert alert-green'>Sizes removed - product now shows a plain Add to Cart button.</div>";
+    } else {
+        $message = "<div class='alert alert-red'>Security token mismatch. Action aborted.</div>";
+    }
 }
 
 $products = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN categories c ON p.category_id = c.id ORDER BY p.id DESC");
@@ -54,17 +62,19 @@ $products = $conn->query("SELECT p.*, c.name AS category_name FROM products p JO
     <meta charset="UTF-8">
     <title>Manage Products - Admin Sportswear</title>
     <style>
-        /* ADMIN PANEL BASE STYLES */
+        /* BASE STYLES */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f0f2f5; color: #333; }
         
-        /* Sidebar Styling */
-        .sidebar { width: 260px; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box;}
-        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px;}
-        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px;}
-        .sidebar a:hover { background: #2d3238; color: white;}
+        /* UNIFIED SIDEBAR STYLES */
+        .sidebar { width: 260px; flex-shrink: 0; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-top: 0; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #2d3238; color: white; }
+        .sidebar .logout { color: #e74c3c; margin-top: 30px; }
+        .sidebar .logout:hover { background: #c0392b; color: white; }
         
         /* Main Content Styling */
-        .main-content { padding: 40px; flex-grow: 1; max-width: 1400px; margin: 0 auto;}
+        .main-content { padding: 40px; flex-grow: 1; max-width: 1400px; }
         .main-content h1 { font-size: 28px; margin-top: 0; color: #1a1d21; }
         
         /* TABLE DESIGN IMPROVEMENTS */
@@ -110,10 +120,10 @@ $products = $conn->query("SELECT p.*, c.name AS category_name FROM products p JO
         <h2>STRIDE Elite</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
-        <a href="manage_products.php" style="background: #2d3238; color: white;">📦 Manage Products</a>
+        <a href="manage_products.php" class="active">📦 Manage Products</a>
         <a href="manage_orders.php">🛒 Manage Orders</a>
         <a href="coupons.php">🎟️ Coupons</a>
-        <a href="../logout.php">🚪 Logout</a>
+        <a href="../logout.php" class="logout">🚪 Logout</a>
     </div>
 
     <div class="main-content">
@@ -128,7 +138,7 @@ $products = $conn->query("SELECT p.*, c.name AS category_name FROM products p JO
                     <th>Product Details</th>
                     <th>Category</th>
                     <th>Price</th>
-                    <th>Base Stock</th> <!-- Form Removed, just a display -->
+                    <th>Base Stock</th>
                     <th>Size breakdown & Stock</th>
                     <th>Actions</th>
                 </tr>
@@ -141,15 +151,41 @@ $products = $conn->query("SELECT p.*, c.name AS category_name FROM products p JO
                 ?>
                 <tr>
                     <td style="color: #888; font-size: 13px;">#<?php echo $row['id']; ?></td>
-                    <td><img src="../<?php echo htmlspecialchars($row['image_url']); ?>" class="prod-img"></td>
+                    
+                    <!-- CORRECTED IMAGE FIX HERE -->
+                    <td>
+                        <?php 
+                        if (!empty($row['image_url'])): 
+                            // Split the images and select the first one
+                            $images = explode(',', $row['image_url']);
+                            $first_image = trim($images[0]);
+                            
+                            // Add '../' because we are inside the admin folder looking outwards
+                            $image_path = "../" . $first_image;
+                        ?>
+                            <img src="<?php echo htmlspecialchars($image_path); ?>" alt="Product Image" class="prod-img">
+                        <?php else: ?>
+                            <img src="../img/favicon.png" alt="No image" class="prod-img">
+                        <?php endif; ?>
+                    </td>
+                    
                     <td class="prod-name"><?php echo htmlspecialchars($row['name']); ?></td>
                     <td><span class="prod-cat"><?php echo htmlspecialchars($row['category_name']); ?></span></td>
                     <td class="prod-price">₹<?php echo $row['price']; ?></td>
                     
                     <!-- Base Stock (No Form) -->
                     <td>
-                        <?php if ($row['stock_quantity'] > 0): ?>
-                            <span class="stock-count"><?php echo $row['stock_quantity']; ?></span>
+                        <?php 
+                        $total_stock = $row['stock_quantity'];
+                        if (!empty($size_rows)) {
+                            $total_stock = 0;
+                            foreach ($size_rows as $sr) {
+                                $total_stock += $sr['stock'];
+                            }
+                        }
+                        if ($total_stock > 0): 
+                        ?>
+                            <span class="stock-count"><?php echo $total_stock; ?></span>
                         <?php else: ?>
                             <span class="out-of-stock">Out</span>
                         <?php endif; ?>
@@ -175,15 +211,16 @@ $products = $conn->query("SELECT p.*, c.name AS category_name FROM products p JO
                         <div class="btn-group">
                             <a href="edit_product.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Edit Inventory</a>
                             
-                            <a href="manage_products.php?delete=<?php echo $row['id']; ?>" class="btn btn-delete" onclick="return confirm('Delete this product? It will be removed from the store forever.');">Delete Product</a>
+                            <a href="manage_products.php?delete=<?php echo $row['id']; ?>&token=<?php echo urlencode(csrf_token()); ?>" class="btn btn-delete" onclick="return confirm('Delete this product? It will be removed from the store forever.');">Delete Product</a>
                             
                             <?php if (!empty($size_rows)): ?>
-                                <a href="manage_products.php?remove_sizes=<?php echo $row['id']; ?>" class="btn btn-sizes" onclick="return confirm('WARNING: This will delete all sizes (S, M, L, etc.) for this product. Stock will be merged back to base stock.');">Remove Sizes</a>
+                                <a href="manage_products.php?remove_sizes=<?php echo $row['id']; ?>&token=<?php echo urlencode(csrf_token()); ?>" class="btn btn-sizes" onclick="return confirm('WARNING: This will delete all sizes (S, M, L, etc.) for this product. Stock will be merged back to base stock.');">Remove Sizes</a>
                             <?php endif; ?>
                         </div>
                     </td>
                 </tr>
-                <?php endwhile; ?>
+                <?php endwhile; ?> 
+               
             </table>
         </div>
     </div>

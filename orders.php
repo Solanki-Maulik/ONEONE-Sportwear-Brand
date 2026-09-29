@@ -88,7 +88,18 @@ function status_steps($status) {
                     <h4 class="mono" style="font-size:11px; letter-spacing:1px; text-transform:uppercase; color:var(--slate); margin-bottom:6px;">Items in this order</h4>
                     <?php while ($line = $items_result->fetch_assoc()): ?>
                         <div class="cart-line" style="padding:10px 0;">
-                            <?php if (!empty($line['image_url'])): ?><img src="<?php echo htmlspecialchars($line['image_url']); ?>" style="width:48px; height:48px;"><?php endif; ?>
+                            
+                            <!-- CORRECTED IMAGE FIX HERE -->
+                            <?php 
+                            if (!empty($line['image_url'])): 
+                                $images = explode(',', $line['image_url']);
+                                $first_image = trim($images[0]);
+                            ?>
+                                <img src="<?php echo htmlspecialchars($first_image); ?>" style="width:48px; height:48px; object-fit: cover; border-radius: 4px;">
+                            <?php else: ?>
+                                <img src="img/favicon.png" style="width:48px; height:48px; object-fit: cover; border-radius: 4px;" alt="No image">
+                            <?php endif; ?>
+                            
                             <div class="cart-line-info">
                                 <h5 style="font-size:13px;"><?php echo htmlspecialchars($line['name']); ?></h5>
                                 <div class="cart-line-qty">
@@ -124,7 +135,7 @@ function status_steps($status) {
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> STRIDE Sportswear</span>
+            <span>&copy; <?php echo date('Y'); ?> ONEONE</span> <!-- BRAND NAME FIXED -->
             <span>Made for people who don't stop at good enough.</span>
         </div>
     </footer>

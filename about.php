@@ -10,6 +10,35 @@ $brand = 'ONEONE';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About — <?php echo htmlspecialchars($brand); ?></title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .about-hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('img/about_hero.jpg') center/cover no-repeat;
+            color: white;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+            padding: 80px 20px;
+        }
+        .about-hero h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        .about-hero p {
+            color: #f1f1f1;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .about-hero .hero-eyebrow {
+            color: #f39c12;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <main>
@@ -18,7 +47,7 @@ $brand = 'ONEONE';
     </section>
     <?php include 'includes/ticker.php'; ?>
 
-    <section class="hero" style="min-height:auto; padding-bottom:60px;">
+    <section class="hero about-hero">
         <div class="hero-copy" style="max-width:700px;">
             <span class="hero-eyebrow">// About <?php echo htmlspecialchars($brand); ?></span>
             <h1>Built by people<br>who train.</h1>
@@ -54,11 +83,22 @@ $brand = 'ONEONE';
             </div>
             <p>We read every message.</p>
         </div>
-        <div class="panel" style="margin:0 auto;">
-            <p style="color:var(--slate); line-height:1.7;">
-                For order questions, use the <a href="orders.php" style="color:var(--accent); font-weight:600;">Track Orders</a> page once you're logged in.
-                For anything else, reach the team at <span class="mono"><?php echo htmlspecialchars('support@stride.example'); ?></span>.
-            </p>
+        <div class="value-strip" style="margin-top: 40px; padding: 0;">
+            <div class="value-item" style="background: white;">
+                <span class="mono">General Enquiries</span>
+                <h4>Email Us</h4>
+                <p><a href="mailto:support@<?php echo strtolower($brand); ?>.com" style="color:var(--accent); text-decoration:none; font-weight:600;">support@<?php echo strtolower($brand); ?>.com</a><br>We aim to reply within 24 hours.</p>
+            </div>
+            <div class="value-item" style="background: white;">
+                <span class="mono">Headquarters</span>
+                <h4>Visit Us</h4>
+                <p>123 Athletics Boulevard<br>Suite 400, New York, NY 10001<br>United States</p>
+            </div>
+            <div class="value-item" style="background: white;">
+                <span class="mono">Phone Support</span>
+                <h4>Call Us</h4>
+                <p><a href="tel:+18005550199" style="color:var(--accent); text-decoration:none; font-weight:600;">+1 (800) 555-0199</a><br>Mon-Fri, 9am - 6pm EST</p>
+            </div>
         </div>
     </section>
 

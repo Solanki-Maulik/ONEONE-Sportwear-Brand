@@ -21,17 +21,50 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
         .hero-section {
             position: relative;
             width: 100%;
-            height: 80vh; /* Change to 100vh if you want it to fill the entire screen */
+            height: 80vh; 
             overflow: hidden;
-            background-color: #000; /* Fallback color */
+            background-color: #000; 
         }
 
-        /* The Local Video */
-        .hero-video {
+        /* Premium Slider Styles */
+        .hero-slider {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* This makes sure the video perfectly crops to fill the screen without stretching */
-            display: block;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            background-size: cover;
+            background-position: center top; /* Focuses on the upper body/face for sportswear */
+            transition: opacity 1.5s ease-in-out;
+            z-index: 1;
+        }
+
+        /* The Dark Overlay for Premium Contrast */
+        .slide::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.25); /* Darkens images slightly so navigation stays readable */
+            z-index: 2;
+        }
+
+        /* The Active Slide + Slow Zoom Animation */
+        .slide.active {
+            opacity: 1;
+            z-index: 3;
+            animation: slowZoom 6s linear forwards;
+        }
+
+        @keyframes slowZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
         }
     </style>
 </head>
@@ -41,13 +74,20 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
         <?php include 'includes/nav.php'; ?>
 
         <section class="hero-section">
-            <!-- Your Local Background Video -->
-            <video class="hero-video" autoplay loop muted playsinline>
-                <source src="img/a.mp4" type="video/mp4">
-            </video>
+            <!-- Premium Image Slider -->
+            <div class="hero-slider">
+                <!-- Slide 1 -->
+                <div class="slide active" style="background-image: url('img/slider1.jpg');"></div>
+                <!-- Slide 2 -->
+                <div class="slide" style="background-image: url('img/slider2.jpg');"></div>
+                <!-- Slide 3 -->
+                <div class="slide" style="background-image: url('img/slider3.jpg');"></div>
+            </div>
         </section>
         
         <?php include 'includes/ticker.php'; ?>
+
+
 
         <!-- ============ CATEGORIES ============ -->
         <section class="section">
@@ -60,7 +100,6 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
             </div>
             <div class="category-strip">
                 <a href="man.php" class="category-tile">
-                    <!-- Men Image -->
                     <img src="./img/Gemini_Generated_Image_69gp3h69gp3h69gp.png">
                     <div class="category-tile-label">
                         <span class="mono">Engineered For</span>
@@ -69,7 +108,6 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                     <span class="category-tile-arrow">&#8594;</span>
                 </a>
                 <a href="woman.php" class="category-tile">
-                    <!-- Women Image -->
                     <img src="./img/Gemini_Generated_Image_o07obdo07obdo07o.png"  style="object-position: top; object-fit: cover;">
                     <div class="category-tile-label">
                         <span class="mono">Engineered For</span>
@@ -97,8 +135,12 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                         <section class="card">
                             <span class="ribbon">New</span>
                             <a href="product.php?id=<?php echo $item['id']; ?>" class="card-link">
-                                <?php if (!empty($item['image_url'])): ?>
-                                    <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                              <?php 
+                                if (!empty($item['image_url'])): 
+                                    $images = explode(',', $item['image_url']);
+                                    $first_image = trim($images[0]); 
+                                ?>
+                                    <img src="<?php echo htmlspecialchars($first_image); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
                                 <?php else: ?>
                                     <img src="img/favicon.png" alt="No image">
                                 <?php endif; ?>
@@ -129,12 +171,17 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                 <?php while ($item = $result->fetch_assoc()): ?>
                     <section class="card">
                         <a href="product.php?id=<?php echo $item['id']; ?>" class="card-link">
-                            <?php if (!empty($item['image_url'])): ?>
-                                <img src="<?php echo htmlspecialchars($item['image_url']); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                            <?php 
+                            if (!empty($item['image_url'])): 
+                                $images = explode(',', $item['image_url']);
+                                $first_image = trim($images[0]);
+                            ?>
+                                <img src="<?php echo htmlspecialchars($first_image); ?>" alt="<?php echo htmlspecialchars($item['name']); ?>">
                             <?php else: ?>
                                 <img src="img/favicon.png" alt="No image">
                             <?php endif; ?>
                         </a>
+                        
                         <a href="product.php?id=<?php echo $item['id']; ?>" class="card-link">
                             <span class="cat-label"><?php echo htmlspecialchars($item['category_name']); ?></span>
                             <h5><?php echo htmlspecialchars($item['name']); ?></h5>
@@ -193,7 +240,6 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
                 </div>
             </div>
             <div class="footer-bottom">
-                <!-- BRAND NAME FIXED HERE -->
                 <span>&copy; <?php echo date('Y'); ?> ONEONE</span>
                 <span>Made for people who don't stop at good enough.</span>
             </div>
@@ -203,6 +249,20 @@ $result = $conn->query("SELECT p.*, c.name AS category_name FROM products p JOIN
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script>
+        // Hero Image Slider Automation
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.hero-slider .slide');
+            let currentSlide = 0;
+            
+            if (slides.length > 1) {
+                setInterval(function() {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }, 5000); // Changes image every 5 seconds
+            }
+        });
+
         // GSAP Scroll Animations
         if (window.gsap && window.ScrollTrigger) {
             gsap.registerPlugin(ScrollTrigger);

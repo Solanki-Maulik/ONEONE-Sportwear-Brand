@@ -1,6 +1,5 @@
 <?php
-// 1. Start the session
-session_start();
+require_once '../includes/session.php';
 
 // 2. THE BOUNCER: Kick out anyone who isn't logged in OR isn't an admin
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
@@ -33,15 +32,15 @@ $recent_orders = $conn->query("SELECT id, total_amount, order_status, created_at
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - ONEONE Elite</title>
+    <title>Admin Dashboard - STRIDE Elite</title>
     <style>
         /* BASE STYLES */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; background: #f0f2f5; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f0f2f5; color: #333; }
         
-        /* SIDEBAR (Matched to manage_products.php) */
-        .sidebar { width: 260px; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box;}
-        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px;}
-        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px;}
+        /* UNIFIED SIDEBAR STYLES */
+        .sidebar { width: 260px; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-top: 0; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px; }
         .sidebar a:hover, .sidebar a.active { background: #2d3238; color: white; }
         .sidebar .logout { color: #e74c3c; margin-top: 30px; }
         .sidebar .logout:hover { background: #c0392b; color: white; }

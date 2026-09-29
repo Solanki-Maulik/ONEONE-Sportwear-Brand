@@ -1,4 +1,6 @@
-    <nav>
+<?php
+require_once __DIR__ . '/helpers.php';
+?>    <nav>
         <a href="index.php" class="brand">ONEONE</a>
         <input type="checkbox" id="nav-toggle" class="nav-toggle">
         <label for="nav-toggle" class="nav-toggle-label">&#9776;</label>
@@ -12,7 +14,7 @@
                 <a href="orders.php"><p>Orders</p></a>
                 <?php if ($_SESSION['role'] === 'admin'): ?>
                     <a href="admin/dashboard.php"><p>Admin</p></a>
-                <?php endif; ?>
+                <?php endif; ?> 
                 <a href="logout.php"><p>Logout</p></a>
            <?php else: ?>
                 <a href="login.php"><p>Login</p></a>

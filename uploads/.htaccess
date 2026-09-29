@@ -1,0 +1,25 @@
+# Disable execution of scripts in uploads directory
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|phar|inc)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# For Apache 2.4+
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|phar|inc)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+# Turn off script engine if mod_php is active
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+Options -Indexes -ExecCGI

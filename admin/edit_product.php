@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../includes/session.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
@@ -17,13 +17,15 @@ $product_id = (int)$_GET['id'];
 
 // Handle form submission to update stock
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_inventory'])) {
-    
-    // 1. Update Base Stock
-    $base_stock = (int)$_POST['stock_quantity'];
-    $stmt = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
-    $stmt->bind_param("ii", $base_stock, $product_id);
-    $stmt->execute();
-    $stmt->close();
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $message = "<div style='background: #e74c3c; color: white; padding: 10px; margin-bottom: 20px; border-radius: 4px;'>Security token mismatch. Please try again.</div>";
+    } else {
+        // 1. Update Base Stock
+        $base_stock = (int)$_POST['stock_quantity'];
+        $stmt = $conn->prepare("UPDATE products SET stock_quantity = ? WHERE id = ?");
+        $stmt->bind_param("ii", $base_stock, $product_id);
+        $stmt->execute();
+        $stmt->close();
 
     // 2. Update Existing Sizes Stock
     if (isset($_POST['sizes']) && is_array($_POST['sizes'])) {
@@ -56,7 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_inventory'])) 
         $check->close();
     }
 
-    $message = "<div style='background: #2ecc71; color: white; padding: 10px; margin-bottom: 20px; border-radius: 4px;'>Inventory updated successfully!</div>";
+        $message = "<div style='background: #2ecc71; color: white; padding: 10px; margin-bottom: 20px; border-radius: 4px;'>Inventory updated successfully!</div>";
+    }
 }
 
 // Fetch the product details
@@ -79,9 +82,18 @@ $size_stmt->close();
     <meta charset="UTF-8">
     <title>Edit Inventory - Admin</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; margin: 0; background: #f4f7f6; }
-        .sidebar { width: 250px; background: #111; color: white; min-height: 100vh; padding: 20px; }
-        .sidebar a { color: #aaa; text-decoration: none; display: block; margin-bottom: 15px; }
+        /* BASE STYLES */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f0f2f5; color: #333; }
+        
+        /* UNIFIED SIDEBAR STYLES */
+        .sidebar { width: 260px; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-top: 0; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #2d3238; color: white; }
+        .sidebar .logout { color: #e74c3c; margin-top: 30px; }
+        .sidebar .logout:hover { background: #c0392b; color: white; }
+
+        /* MAIN CONTENT STYLES */
         .main-content { padding: 40px; flex-grow: 1; max-width: 800px; }
         .edit-card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 20px; }
@@ -96,13 +108,13 @@ $size_stmt->close();
 </head>
 <body>
     <div class="sidebar">
-        <h2>Sportswear Elite</h2>
+        <h2>STRIDE Elite</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
-        <a href="manage_products.php" style="color: #f39c12;">📦 Manage Products</a>
+        <a href="manage_products.php" class="active">📦 Manage Products</a>
         <a href="manage_orders.php">🛒 Manage Orders</a>
         <a href="coupons.php">🎟️ Coupons</a>
-        <a href="../logout.php">🚪 Logout</a>
+        <a href="../logout.php" class="logout">🚪 Logout</a>
     </div>
 
     <div class="main-content">
@@ -113,7 +125,7 @@ $size_stmt->close();
             <?php echo $message; ?>
 
             <form method="POST" action="">
-                
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
                 <!-- BASE STOCK -->
                 <div class="form-group">
                     <label>Base Stock (For products without sizes)</label>

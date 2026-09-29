@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once '../includes/session.php';
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../login.php");
     exit();
@@ -9,11 +9,14 @@ require '../db.php';
 // Handle Status Update
 $valid_statuses = ['placed', 'packed', 'shipped', 'delivered', 'cancelled'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_id']) && isset($_POST['status'])) {
-    $update_id = (int)$_POST['update_id'];
-    $status = in_array($_POST['status'], $valid_statuses, true) ? $_POST['status'] : 'placed';
-    $stmt = $conn->prepare("UPDATE orders SET order_status = ? WHERE id = ?");
-    $stmt->bind_param("si", $status, $update_id);
-    $stmt->execute();
+    if (verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $update_id = (int)$_POST['update_id'];
+        $status = in_array($_POST['status'], $valid_statuses, true) ? $_POST['status'] : 'placed';
+        $stmt = $conn->prepare("UPDATE orders SET order_status = ? WHERE id = ?");
+        $stmt->bind_param("si", $status, $update_id);
+        $stmt->execute();
+        $stmt->close();
+    }
     header("Location: manage_orders.php");
     exit();
 }
@@ -31,9 +34,18 @@ $orders = $conn->query("
     <meta charset="UTF-8">
     <title>Manage Orders - Admin</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; margin: 0; background: #f4f7f6; }
-        .sidebar { width: 250px; background: #111; color: white; min-height: 100vh; padding: 20px; }
-        .sidebar a { color: #aaa; text-decoration: none; display: block; margin-bottom: 15px; }
+        /* BASE STYLES */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f0f2f5; color: #333; }
+        
+        /* UNIFIED SIDEBAR STYLES */
+        .sidebar { width: 260px; background: #1a1d21; color: white; min-height: 100vh; padding: 25px; box-sizing: border-box; }
+        .sidebar h2 { font-size: 20px; text-transform: uppercase; letter-spacing: 1px; color: #f39c12; margin-top: 0; margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .sidebar a { color: #cbd5e0; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; transition: background 0.2s; font-size: 15px; }
+        .sidebar a:hover, .sidebar a.active { background: #2d3238; color: white; }
+        .sidebar .logout { color: #e74c3c; margin-top: 30px; }
+        .sidebar .logout:hover { background: #c0392b; color: white; }
+
+        /* MAIN CONTENT STYLES */
         .main-content { padding: 40px; flex-grow: 1; }
         table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
@@ -52,13 +64,13 @@ $orders = $conn->query("
 </head>
 <body>
     <div class="sidebar">
-        <h2>Sportswear Elite</h2>
+        <h2>STRIDE Elite</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
         <a href="manage_products.php">📦 Manage Products</a>
-        <a href="manage_orders.php" style="color: #f39c12;">🛒 Manage Orders</a>
+        <a href="manage_orders.php" class="active">🛒 Manage Orders</a>
         <a href="coupons.php">🎟️ Coupons</a>
-        <a href="../logout.php">🚪 Logout</a>
+        <a href="../logout.php" class="logout">🚪 Logout</a>
     </div>
 
     <div class="main-content">
@@ -87,6 +99,7 @@ $orders = $conn->query("
                 <td><span class="status-pill <?php echo htmlspecialchars($row['order_status']); ?>"><?php echo strtoupper($row['order_status']); ?></span></td>
                 <td>
                     <form action="manage_orders.php" method="POST" class="status-form">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
                         <input type="hidden" name="update_id" value="<?php echo $row['id']; ?>">
                         <select name="status">
                             <?php foreach ($valid_statuses as $s): ?>

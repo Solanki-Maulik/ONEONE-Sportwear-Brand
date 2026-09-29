@@ -1,7 +1,7 @@
 <?php
 require 'includes/session.php';
 require 'db.php';
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 $login_error = "";
@@ -10,49 +10,65 @@ $register_success = "";
 $show_register = isset($_GET['register']);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'login') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    $password = $_POST['password'] ?? '';
 
-    $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
-            header("Location: " . ($user['role'] === 'admin' ? 'admin/dashboard.php' : 'index.php'));
-            exit();
-        } else {
-            $login_error = "Incorrect password.";
-        }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $login_error = "Please enter a valid email address.";
     } else {
-        $login_error = "No account found with that email.";
+        $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $user = $result->fetch_assoc();
+            if (password_verify($password, $user['password'])) {
+                // Prevent Session Fixation attack
+                session_regenerate_id(true);
+
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role'] = $user['role'];
+
+                header("Location: " . ($user['role'] === 'admin' ? 'admin/dashboard.php' : 'index.php'));
+                exit();
+            } else {
+                $login_error = "Incorrect password.";
+            }
+        } else {
+            $login_error = "No account found with that email.";
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'register') {
     $show_register = true;
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $username = trim($_POST['username'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
+    $password = $_POST['password'] ?? '';
 
-    $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-    $stmt->bind_param("sss", $username, $email, $hashed_password);
-    try {
-        $stmt->execute();
-        $register_success = "Account created! You can log in now.";
-        $show_register = false;
-    } catch (mysqli_sql_exception $e) {
-        $register_error = ($e->getCode() == 1062) ? "An account with that email already exists." : "Database error.";
+    if (empty($username) || strlen($username) < 2) {
+        $register_error = "Please enter a valid name (at least 2 characters).";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $register_error = "Please enter a valid email address.";
+    } elseif (strlen($password) < 6) {
+        $register_error = "Password must be at least 6 characters long.";
+    } else {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $email, $hashed_password);
+        try {
+            $stmt->execute();
+            $register_success = "Account created! You can log in now.";
+            $show_register = false;
+        } catch (mysqli_sql_exception $e) {
+            $register_error = ($e->getCode() == 1062) ? "An account with that email already exists." : "Registration failed. Please try again.";
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 ?>
 <!DOCTYPE html>
@@ -121,10 +137,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     <script>
         if (window.gsap) {
             function playAuthIntro(faceSelector) {
-                // Instantly reset elements
-                gsap.set(faceSelector + ' .anm', { opacity: 0, y: 15 }); 
-                
-                // Fast, subtle slide-up animation (removed the slow scale effect)
+                // Reset elements for animation
+                gsap.set(faceSelector + ' .anm', { opacity: 0, y: 15 });
+
                 gsap.to(faceSelector + ' .anm', { 
                     opacity: 1, 
                     y: 0, 
