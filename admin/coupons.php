@@ -99,7 +99,7 @@ $coupons = $conn->query("SELECT * FROM coupons ORDER BY id DESC");
 
     <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <h2>STRIDE Elite</h2>
+        <h2>ElevenX HQ</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
         <a href="manage_products.php">📦 Manage Products</a>

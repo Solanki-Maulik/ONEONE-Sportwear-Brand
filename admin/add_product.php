@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_product'])) {
 
     <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <h2>STRIDE Elite</h2>
+        <h2>ElevenX HQ</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php" class="active">➕ Add Product</a>
         <a href="manage_products.php">📦 Manage Products</a>

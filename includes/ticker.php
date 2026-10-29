@@ -1,9 +1,9 @@
 <?php
 $__ticker = [
-    'Free shipping over ₹2,000',
-    'New drop every friday',
+    'Free express shipping over ₹2,000',
+    'Engineered for speed & endurance',
     'Easy 30-day returns',
-    'Train with STRIDE',
+    'Train beyond limits with ElevenX',
 ];
 ?>
     <div class="ticker">

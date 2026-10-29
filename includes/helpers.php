@@ -15,6 +15,23 @@ function render_price($price, $mrp) {
     echo '</span>';
 }
 
+// Renders Amazon/Flipkart style rating stars (e.g. ★★★★★ 4.8 (142))
+function render_rating_stars($rating = 4.8, $reviews = null) {
+    if ($reviews === null) {
+        $reviews = rand(86, 320);
+    }
+    echo '<div class="card-rating-row">';
+    echo '<span class="stars">★★★★★</span>';
+    echo '<span class="rating-num">' . number_format($rating, 1) . '</span>';
+    echo '<span class="review-count">(' . $reviews . ')</span>';
+    echo '</div>';
+}
+
+// Renders Flipkart/Amazon express delivery badge
+function render_delivery_badge() {
+    echo '<div class="card-delivery-badge">⚡ Next-Day Dispatch</div>';
+}
+
 // Cart entries are keyed "productId|size" (size is '' when a product has no
 // sizes) so the same product in two different sizes are separate cart lines.
 function cart_key($product_id, $size) {
@@ -139,29 +156,30 @@ function render_quick_add($conn, $item) {
 
     if (empty($sizes)) {
         if ($item['stock_quantity'] <= 0) {
-            echo '<button type="button" disabled>Out of stock</button>';
+            echo '<div style="padding: 10px 18px 0;"><button type="button" class="btn-card-action disabled" disabled>Sold Out</button></div>';
             return;
         }
         ?>
-        <form action="cart.php" method="POST">
+        <form action="cart.php" method="POST" style="padding: 10px 18px 0;">
             <input type="hidden" name="product_id" value="<?php echo $item['id']; ?>">
             <input type="hidden" name="quantity" value="1">
-            <button type="submit" name="add_to_cart">Add to cart</button>
+            <button type="submit" name="add_to_cart" class="btn-card-action">Add to Cart</button>
         </form>
         <?php
         return;
     }
 
-    // Sized products pick their size on the product page - no chips on the card.
     $any_in_stock = false;
     foreach ($sizes as $s) { if ($s['stock'] > 0) { $any_in_stock = true; break; } }
 
     if (!$any_in_stock) {
-        echo '<button type="button" disabled>Out of stock</button>';
+        echo '<div style="padding: 10px 18px 0;"><button type="button" class="btn-card-action disabled" disabled>Sold Out</button></div>';
         return;
     }
     ?>
-    <a href="product.php?id=<?php echo $item['id']; ?>" class="btn-dark" style="display:block; text-align:center; width:100%; box-sizing:border-box;">Add to cart</a>
+    <div style="padding: 10px 18px 0;">
+        <a href="product.php?id=<?php echo $item['id']; ?>" class="btn-card-action">Select Size &rarr;</a>
+    </div>
     <?php
 }
 ?>

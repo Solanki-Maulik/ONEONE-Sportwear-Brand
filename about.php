@@ -1,14 +1,15 @@
 <?php
 require 'includes/session.php';
 require 'db.php';
-$brand = 'ONEONE';
+$brand = 'ElevenX';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About — <?php echo htmlspecialchars($brand); ?></title>
+    <title>About ElevenX — Performance Engineered Athletics</title>
+    <meta name="description" content="Learn about ElevenX: engineered performance sportswear, footwear, and apparel built for athletes who push boundaries.">
     <link rel="stylesheet" href="style.css">
     <style>
         .about-hero {
@@ -31,12 +32,13 @@ $brand = 'ONEONE';
             line-height: 1.6;
         }
         .about-hero .hero-eyebrow {
-            color: #f39c12;
+            color: var(--accent);
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 2px;
             display: block;
             margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 77, 35, 0.5);
         }
     </style>
 </head>
@@ -84,17 +86,17 @@ $brand = 'ONEONE';
             <p>We read every message.</p>
         </div>
         <div class="value-strip" style="margin-top: 40px; padding: 0;">
-            <div class="value-item" style="background: white;">
+            <div class="value-item">
                 <span class="mono">General Enquiries</span>
                 <h4>Email Us</h4>
                 <p><a href="mailto:support@<?php echo strtolower($brand); ?>.com" style="color:var(--accent); text-decoration:none; font-weight:600;">support@<?php echo strtolower($brand); ?>.com</a><br>We aim to reply within 24 hours.</p>
             </div>
-            <div class="value-item" style="background: white;">
+            <div class="value-item">
                 <span class="mono">Headquarters</span>
                 <h4>Visit Us</h4>
                 <p>123 Athletics Boulevard<br>Suite 400, New York, NY 10001<br>United States</p>
             </div>
-            <div class="value-item" style="background: white;">
+            <div class="value-item">
                 <span class="mono">Phone Support</span>
                 <h4>Call Us</h4>
                 <p><a href="tel:+18005550199" style="color:var(--accent); text-decoration:none; font-weight:600;">+1 (800) 555-0199</a><br>Mon-Fri, 9am - 6pm EST</p>
@@ -105,7 +107,7 @@ $brand = 'ONEONE';
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand"><?php echo htmlspecialchars($brand); ?></a>
+                <a href="index.php" class="brand"><span class="brand-word">ELEVENX</span><span class="brand-badge">ATHLETICS</span></a>
                 <p><?php echo htmlspecialchars('Performance sportswear built for the run, the court, and everything after.'); ?></p>
             </div>
             <div class="footer-col">
@@ -122,8 +124,8 @@ $brand = 'ONEONE';
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($brand); ?> Sportswear</span>
-            <span>Made for people who don't stop at good enough.</span>
+            <span>&copy; <?php echo date('Y'); ?> ElevenX Athletics. All rights reserved.</span>
+            <span>Made for athletes who don't stop at good enough.</span>
         </div>
     </footer>
     </main>

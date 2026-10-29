@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — ONEONE</title>
+    <title>Account Access — ElevenX</title>
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             <div class="flip-face flip-front">
                 <div class="header-row">
                     <a href="index.php" class="back-link">← Store</a>
-                    <div class="mini-brand">ONEONE</div>
+                    <div class="mini-brand"><span class="brand-word">ELEVENX</span><span class="brand-badge">ATHLETICS</span></div>
                 </div>
                 <h3>Welcome Back</h3>
 
@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             <div class="flip-face flip-back">
                 <div class="header-row">
                     <a href="index.php" class="back-link">← Store</a>
-                    <div class="mini-brand">ONEONE</div>
+                    <div class="mini-brand"><span class="brand-word">ELEVENX</span><span class="brand-badge">ATHLETICS</span></div>
                 </div>
                 <h3>Create Account</h3>
 

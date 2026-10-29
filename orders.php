@@ -30,7 +30,7 @@ function status_steps($status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Orders — ONEONE</title>
+    <title>Your Orders — ElevenX</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -119,7 +119,7 @@ function status_steps($status) {
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">ONEONE</a>
+                <a href="index.php" class="brand"><span class="brand-word">ELEVENX</span><span class="brand-badge">ATHLETICS</span></a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">
@@ -135,8 +135,8 @@ function status_steps($status) {
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> ONEONE</span> <!-- BRAND NAME FIXED -->
-            <span>Made for people who don't stop at good enough.</span>
+            <span>&copy; <?php echo date('Y'); ?> ElevenX Athletics. All rights reserved.</span>
+            <span>Made for athletes who don't stop at good enough.</span>
         </div>
     </footer>
     </main>

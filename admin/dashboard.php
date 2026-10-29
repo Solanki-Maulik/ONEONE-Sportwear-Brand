@@ -32,7 +32,7 @@ $recent_orders = $conn->query("SELECT id, total_amount, order_status, created_at
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - STRIDE Elite</title>
+    <title>Admin Dashboard — ElevenX</title>
     <style>
         /* BASE STYLES */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; margin: 0; background: #f0f2f5; color: #333; }
@@ -86,7 +86,7 @@ $recent_orders = $conn->query("SELECT id, total_amount, order_status, created_at
 
     <!-- Sidebar Navigation -->
     <div class="sidebar">
-        <h2>STRIDE Elite</h2>
+        <h2>ElevenX HQ</h2>
         <a href="dashboard.php" class="active">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
         <a href="manage_products.php">📦 Manage Products</a>

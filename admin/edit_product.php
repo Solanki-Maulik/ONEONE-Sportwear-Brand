@@ -108,7 +108,7 @@ $size_stmt->close();
 </head>
 <body>
     <div class="sidebar">
-        <h2>STRIDE Elite</h2>
+        <h2>ElevenX HQ</h2>
         <a href="dashboard.php">📊 Dashboard</a>
         <a href="add_product.php">➕ Add Product</a>
         <a href="manage_products.php" class="active">📦 Manage Products</a>

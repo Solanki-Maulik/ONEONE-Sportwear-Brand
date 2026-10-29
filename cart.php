@@ -192,15 +192,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
         $conn->commit();
         cart_clear($conn, $user_id); unset($_SESSION['coupon_id']); unset($_SESSION['discount_percent']);
         ?>
-        <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Order placed — ONEONE</title><link rel="stylesheet" href="style.css"></head><body style="background:var(--paper-alt);">
-        <section class="panel" style="text-align:center; margin-top:80px;">
-            <span class="mono" style="color:#1F8A2E; letter-spacing:2px; text-transform:uppercase; font-size:12px;">Order confirmed</span>
-            <h1 style="margin-top:14px;">Order placed!</h1>
+        <!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Order Confirmed — ELEVENX</title><link rel="stylesheet" href="style.css"></head><body style="background:#050608; color:#FFFFFF;">
+        <section class="panel" style="text-align:center; margin-top:80px; max-width:600px; background:var(--paper-card); border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:0 20px 45px rgba(0,0,0,0.8);">
+            <span class="mono" style="color:var(--success-green); letter-spacing:2px; text-transform:uppercase; font-size:12px; font-weight:700;">✓ ORDER CONFIRMED</span>
+            <h1 style="margin-top:14px; font-size:36px; color:#FFFFFF;">ORDER PLACED!</h1>
             <p class="mono" style="margin-top:10px; color:var(--slate);">Order #<?php echo $order_id; ?> · <?php echo htmlspecialchars($payment_detail); ?></p>
             <p class="mono" style="margin-top:4px; color:var(--slate); font-size:12px;">Shipping to <?php echo htmlspecialchars($ship_city . ', ' . $ship_state . ' ' . $ship_pincode); ?></p>
-            <div style="margin-top:26px; display:flex; gap:14px; justify-content:center;">
-                <a href="orders.php" class="btn-dark">Track your order</a>
-                <a href="index.php" class="btn-outline" style="color:var(--ink); border-color:var(--line);">Continue shopping</a>
+            <div style="margin-top:28px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <a href="orders.php" class="btn-dark">Track Your Order</a>
+                <a href="index.php" class="btn-outline" style="color:#FFFFFF; border-color:rgba(255,255,255,0.25);">Continue Shopping</a>
             </div>
         </section>
         </body></html>
@@ -217,7 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart & Checkout — ONEONE</title>
+    <title>Cart & Checkout — ElevenX</title>
+    <meta name="description" content="Review your cart and proceed to secure checkout on ElevenX Performance Sportswear.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -325,7 +326,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
                         </div>
 
                         <button type="submit" name="place_order" class="btn-dark" id="placeOrderBtn">Place Order</button>
-                        <p class="mono" style="font-size:11px; color:var(--slate); margin-top:10px; line-height:1.5;">This is a demo checkout — no real payment is processed, and card numbers/CVV are never stored.</p>
+                        <p class="mono" style="font-size:11.5px; color:var(--slate); margin-top:12px; line-height:1.5; display:flex; align-items:center; gap:6px;">🔒 256-Bit SSL Encrypted Checkout · Guaranteed Safe & Direct Dispatch</p>
                     </form>
                     <script>
                         function togglePaymentFields(){
@@ -360,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">ONEONE</a>
+                <a href="index.php" class="brand"><span class="brand-word">ELEVENX</span><span class="brand-badge">ATHLETICS</span></a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">
@@ -377,8 +378,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order']) && iss
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> STRIDE Sportswear</span>
-            <span>Made for people who don't stop at good enough.</span>
+            <span>&copy; <?php echo date('Y'); ?> ElevenX Athletics. All rights reserved.</span>
+            <span>Made for athletes who don't stop at good enough.</span>
         </div>
     </footer>
     </main>

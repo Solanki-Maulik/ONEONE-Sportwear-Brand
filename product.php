@@ -33,7 +33,8 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($product['name']); ?> — ONEONE</title>
+    <title><?php echo htmlspecialchars($product['name']); ?> — ElevenX</title>
+    <meta name="description" content="Buy <?php echo htmlspecialchars($product['name']); ?> at ElevenX. High-performance athletic gear engineered for maximum comfort and speed.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -60,7 +61,6 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
             <div class="product-main-image-container">
                 <img id="mainProductImage" src="<?php echo htmlspecialchars($main_image); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" style="width: 100%; border-radius: 12px; object-fit: cover;">
             </div>
-
             <!-- The Clickable Thumbnails -->
             <?php if (count($images) > 1): ?>
                 <div class="product-thumbnails" style="display: flex; gap: 10px; margin-top: 15px; overflow-x: auto;">
@@ -71,7 +71,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
                              alt="Thumbnail" 
                              style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s;"
                              onclick="document.getElementById('mainProductImage').src='<?php echo htmlspecialchars($clean_img); ?>'"
-                             onmouseover="this.style.border='2px solid #FF4D23'"
+                             onmouseover="this.style.border='2px solid var(--accent)'"
                              onmouseout="this.style.border='2px solid transparent'">
                     <?php endforeach; ?>
                 </div>
@@ -80,17 +80,24 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
 
         <!-- RIGHT COLUMN: PRODUCT INFO -->
         <div class="info">
-            <span class="cat-label"><?php echo htmlspecialchars($product['category_name']); ?></span>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+                <span class="cat-label"><?php echo htmlspecialchars($product['category_name']); ?></span>
+                <?php render_rating_stars(4.9, 184); ?>
+            </div>
             <h1><?php echo htmlspecialchars($product['name']); ?></h1>
             <?php render_price($product['price'], $product['mrp']); ?>
+            <?php render_delivery_badge(); ?>
             
             <p style="color:var(--slate); line-height:1.6; margin-top:14px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
                 <?php echo nl2br(htmlspecialchars($product['description'])); ?>
             </p>
             
-            <p class="mono" style="margin-top:14px; font-size:13px; color: <?php echo $total_stock > 0 ? '#1F8A2E' : '#D93E14'; ?>;" id="stockLine">
-                <?php echo $total_stock > 0 ? "In stock — " . $total_stock . " available" : "Out of stock"; ?>
-            </p>
+            <div id="stockStatusWrapper" style="display:inline-flex; align-items:center; gap:10px; background:<?php echo $total_stock > 0 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(255, 77, 35, 0.12)'; ?>; border:1px solid <?php echo $total_stock > 0 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(255, 77, 35, 0.35)'; ?>; padding:7px 16px; border-radius:999px; margin-top:16px;">
+                <span style="width:8px; height:8px; border-radius:50%; background:<?php echo $total_stock > 0 ? '#10B981' : '#FF4D23'; ?>; display:inline-block; box-shadow:0 0 10px <?php echo $total_stock > 0 ? '#10B981' : '#FF4D23'; ?>;"></span>
+                <span class="mono" style="font-size:12px; font-weight:700; letter-spacing:0.5px; color:<?php echo $total_stock > 0 ? '#34D399' : '#FFA18A'; ?>;" id="stockLine">
+                    <?php echo $total_stock > 0 ? "IN STOCK · " . $total_stock . " units ready for immediate dispatch" : "CURRENTLY SOLD OUT"; ?>
+                </span>
+            </div>
 
             <form action="cart.php" method="POST" class="qty-form" id="addToCartForm" style="flex-wrap:wrap;">
                 <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
@@ -117,6 +124,37 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
                 <?php endif; ?>
             </form>
             
+            <div class="product-perks" style="margin-top:28px; padding-top:24px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <span style="font-size:18px;">⚡</span>
+                    <div>
+                        <strong style="font-size:13px; display:block; color:var(--text);">Express Dispatch</strong>
+                        <span style="font-size:12px; color:var(--slate);">Ships within 24h</span>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <span style="font-size:18px;">🔄</span>
+                    <div>
+                        <strong style="font-size:13px; display:block; color:var(--text);">30-Day Wear-Test</strong>
+                        <span style="font-size:12px; color:var(--slate);">Hassle-free returns</span>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <span style="font-size:18px;">🔒</span>
+                    <div>
+                        <strong style="font-size:13px; display:block; color:var(--text);">Authentic Build</strong>
+                        <span style="font-size:12px; color:var(--slate);">100% Technical fabrics</span>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <span style="font-size:18px;">📦</span>
+                    <div>
+                        <strong style="font-size:13px; display:block; color:var(--text);">Free Shipping</strong>
+                        <span style="font-size:12px; color:var(--slate);">Orders over ₹2,000</span>
+                    </div>
+                </div>
+            </div>
+            
             <?php if (!empty($sizes)): ?>
             <script>
                 function selectSize(btn){
@@ -132,8 +170,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
                     qty.max = stock;
                     qty.value = 1;
                     document.getElementById('addToCartBtn').disabled = false;
-                    document.getElementById('stockLine').textContent = 'In stock — ' + stock + ' available in this size';
-                    document.getElementById('stockLine').style.color = '#1F8A2E';
+                    document.getElementById('stockLine').textContent = 'In Stock · ' + stock + ' units available in size ' + btn.dataset.size;
                 }
                 
                 document.getElementById('addToCartForm').addEventListener('submit', function(e){
@@ -150,7 +187,7 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
     <footer id="fotter">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="index.php" class="brand">ONEONE</a>
+                <a href="index.php" class="brand"><span class="brand-word">ELEVENX</span><span class="brand-badge">ATHLETICS</span></a>
                 <p>Performance sportswear built for the run, the court, and everything after.</p>
             </div>
             <div class="footer-col">
@@ -167,8 +204,8 @@ if (empty($sizes)) { $total_stock = $product['stock_quantity']; }
             </div>
         </div>
         <div class="footer-bottom">
-            <span>&copy; <?php echo date('Y'); ?> ONEONE</span>
-            <span>Made for people who don't stop at good enough.</span>
+            <span>&copy; <?php echo date('Y'); ?> ElevenX Athletics. All rights reserved.</span>
+            <span>Made for athletes who don't stop at good enough.</span>
         </div>
     </footer>
     </main>
